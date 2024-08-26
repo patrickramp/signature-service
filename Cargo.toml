@@ -1,0 +1,15 @@
+[package]
+name = "signing-service"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+actix-web = "4.9.0"           # Actix web framework
+actix-cors = "0.7.0"         # CORS support
+tokio = { version = "1.39.3", features = ["full"] }  # Async runtime
+ring = "0.17.8"             # Cryptography library
+serde = { version = "1.0.209", features = ["derive"] }  # Serialization
+serde_json = "1.0.127"        # JSON handling
+base64 = "0.22.1"            # Base64 encoding
+signature = "2.2.0"   
+base58 = "0.2.0"            # RSA signature handling
