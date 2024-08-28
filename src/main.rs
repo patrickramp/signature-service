@@ -80,7 +80,7 @@ async fn main() -> std::io::Result<()> {
     }
 
     // Print server startup message
-    println!("Signing Server running on http://0.0.0.0:8888/sign");
+    println!("Signing Server running on http://{}:{}", bind_to, port "/sign");
 
     // Set logging environment variable
     std::env::set_var("RUST_LOG", "actix_web=info");
