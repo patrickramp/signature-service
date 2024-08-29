@@ -1,5 +1,5 @@
 /target
-/src/certs/*
+/src/certs
 Cargo.lock
 package-lock.json
 package.json
