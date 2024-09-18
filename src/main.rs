@@ -59,6 +59,7 @@ async fn main() -> std::io::Result<()> {
     let bind_to = env::var("BIND_TO").unwrap_or_else(|_| "0.0.0.0".to_string());
     let port = env::var("PORT").unwrap_or_else(|_| "8888".to_string());
     let log_level = env::var("LOG_LEVEL").unwrap_or_else(|_| "info".to_string());
+    let origin = env::var("ORIGIN").unwrap_or_else(|_| "*".to_string());
 
     // Initialize logging
     env_logger::init_from_env(env_logger::Env::new().default_filter_or(log_level));
@@ -79,6 +80,9 @@ async fn main() -> std::io::Result<()> {
         println!("Private key found: {}", private_key_file);
     }
 
+    // Split the `ORIGIN` environment variable into multiple origins
+    let allowed_origins: Vec<String> = origin.split(',').map(|s| s.trim().to_string()).collect();
+
     // Print server startup message
     println!(
         "Signing Server starting on http://{}:{}/sign",
@@ -91,15 +95,24 @@ async fn main() -> std::io::Result<()> {
             private_key_file: private_key_file.clone(),
         }));
 
+        let mut cors = Cors::default() // Configure Cross-Origin Resource Sharing (CORS)
+            .allowed_methods(vec!["POST"]) // Allow only POST requests
+            .allow_any_header(); // Allow any HTTP header
+
+        // Handle the wildcard case for allowing any origin
+        if allowed_origins.len() == 1 && allowed_origins[0] == "*" {
+            cors = cors.allow_any_origin();
+        } else {
+            // Add each allowed origin to the CORS configuration
+            for allowed_origin in &allowed_origins {
+                cors = cors.allowed_origin(allowed_origin);
+            }
+        }
+
         App::new()
             .app_data(web::Data::new(state.clone())) // Share application state with handlers
             .wrap(middleware::Logger::default()) // Enable request logging
-            .wrap(
-                Cors::default() // Configure Cross-Origin Resource Sharing (CORS)
-                    .allow_any_origin() // Allow requests from any origin
-                    .allowed_methods(vec!["POST"]) // Allow only POST requests
-                    .allow_any_header(), // Allow any HTTP header
-            )
+            .wrap(cors)
             .route("/sign", web::post().to(sign_email)) // Define the /sign endpoint
     })
     .bind(format!("{}:{}", bind_to, port)) // Bind server to address and port
