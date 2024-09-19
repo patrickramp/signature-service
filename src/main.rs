@@ -97,11 +97,10 @@ async fn main() -> std::io::Result<()> {
 
         let mut cors = Cors::default() // Configure Cross-Origin Resource Sharing (CORS)
             .allowed_methods(vec!["POST"]) // Allow only POST requests
-            .allow_any_header(); // Allow any HTTP header
 
         // Handle the wildcard case for allowing any origin
         if allowed_origins.len() == 1 && allowed_origins[0] == "*" {
-            cors = cors.allow_any_origin();
+            cors = cors.allow_any_origin(); // Allow any HTTP header
         } else {
             // Add each allowed origin to the CORS configuration
             for allowed_origin in &allowed_origins {

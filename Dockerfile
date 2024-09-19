@@ -15,14 +15,11 @@ FROM alpine:latest
 RUN apk upgrade --no-cache \
     && apk add --no-cache libgcc
 
-COPY --from=builder /actix-webserver/target/release/signing-service /usr/local/bin/signing-service
+COPY --from=builder /signing-service/target/release/signing-service /usr/local/bin/signing-service
 
 RUN adduser -H -S -s /sbin/nologin signer \
     && addgroup -S signer \
-    && chown -R signer:signer /usr/local/bin/signing-service
-    && chown -R signer:signer /certs/
-
-COPY ./public /var/www/public
+    && chown -R signer:signer /usr/local/bin/signing-service 
 
 USER signer
 
